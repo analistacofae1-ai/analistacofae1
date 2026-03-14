@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestión de pagos</title>
+<style>
+
+:root{
+--primary:#3B6EDC;
+--primary-light:#eaf1ff;
+--bg:linear-gradient(135deg,#f4f7fb 0%,#e8f0ff 100%);
+--card:#fff;
+--muted:#6b7280;
+--border:#e5e9f2;
+--radius:14px;
+}
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:'Inter','Segoe UI',sans-serif;
+background:var(--bg);
+}
+
+header{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+header h2{
+color:var(--primary);
+margin:0;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+display:grid;
+gap:20px;
+}
+
+.card{
+background:var(--card);
+border-radius:var(--radius);
+box-shadow:0 4px 18px rgba(0,0,0,.08);
+padding:22px;
+}
+
+.card h3{
+margin:0 0 14px;
+font-size:15px;
+color:var(--primary);
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+gap:4px;
+}
+
+label{
+font-size:12px;
+font-weight:600;
+color:var(--muted);
+}
+
+input,select{
+padding:10px;
+border:1px solid var(--border);
+border-radius:10px;
+font-size:14px;
+background:#fafcff;
+}
+
+input:focus,select:focus{
+outline:none;
+border-color:var(--primary);
+box-shadow:0 0 0 2px var(--primary-light);
+}
+
+input[readonly]{
+background:#eef3ff;
+}
+
+button{
+border:none;
+border-radius:10px;
+padding:12px;
+font-weight:600;
+cursor:pointer;
+height:42px;
+}
+
+.primary{
+background:var(--primary);
+color:white;
+}
+
+.primary:hover{
+background:#2a5aa8;
+}
+
+.btn-limpiar{
+background:#e9edf5;
+color:#6b7280;
+}
+
+.btn-limpiar:hover{
+background:#dce1eb;
+}
+
+#customAlert{
+position:fixed;
+top:20px;
+right:20px;
+background:#28a745;
+color:white;
+padding:14px 18px;
+border-radius:12px;
+display:none;
+font-weight:600;
+}
+
+.comprobante-btn{
+border:1px solid var(--primary);
+color:var(--primary);
+background:white;
+height:42px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:10px;
+font-weight:600;
+cursor:pointer;
+}
+
+.comprobante-btn:hover{
+background:var(--primary);
+color:white;
+}
+
+@media(max-width:900px){
+.grid{
+grid-template-columns:1fr 1fr;
+}
+}
+@media(max-width:600px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+</style>
+</head>
+<body>
+
+<header>
+<h2>FORMATO GESTIÓN DE PAGOS</h2>
+</header>
+
+<div id="customAlert"></div>
+<form id="formulario" class="container">
+<div class="card">
+<h3>DATOS DEL PAGO</h3>
+<div class="grid">
+
+<div class="field">
+<label>DOCUMENTO TERCERO</label>
+<input type="text"
+name="DOCUMENTO_TERCERO"
+maxlength="10"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+
+<div class="field">
+<label>DOCUMENTO ESTUDIANTE</label>
+<input type="text"
+name="DOCUMENTO_ESTUDIANTE"
+required
+maxlength="10"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+
+<div class="field">
+<label>DOCUMENTO TITULAR</label>
+<input type="text"
+name="DOCUMENTO_TITULAR"
+required
+maxlength="10"
+oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+
+<div class="field">
+<label>CONTRATO</label>
+<input type="text"
+name="CONTRATO"
+required
+maxlength="16"
+oninput="this.value=this.value.replace(/[^a-zA-Z0-9\-]/g,'')">
+</div>
+
+<div class="field">
+<label>GESTOR ASIGNADO</label>
+<select name="GESTOR" required>
+<option></option>
+<option>A&G</option>
+<option>A&S SOLUCIONES</option>
+<option>JJ COBRANZAS</option>
+<option>PUNTUALMENTE</option>
+</select>
+</div>
+
+<div class="field">
+<label>VALOR PAGO</label>
+<input type="text"
+id="valorPago"
+name="VALOR_PAGO"
+required>
+</div>
+
+<div class="field">
+<label>VALOR SMART</label>
+<input type="text"
+id="valorSmart"
+name="VALOR_SMART">
+</div>
+
+<div class="field">
+<label>VALOR CASA DE COBRO</label>
+<input type="text"
+id="valorCasa"
+name="VALOR_CASA_DE_COBRO"
+readonly>
+</div>
+
+<div class="field">
+<label>CONCEPTO CONTABLE</label>
+<select name="CONCEPTO_DE_PAGO" required>
+<option></option>
+<option>INGRESO RECIBIDO PARA TERCEROS</option>
+<option>HONORARIOS</option>
+</select>
+</div>
+
+<div class="field">
+<label>CONCEPTO DE PAGO</label>
+<select name="CONCEPTO_DE_PAGO" required>
+<option></option>
+<option>CLÁUSULA PENAL</option>
+<option>CLÁUSULA ESPECIAL</option>
+<option>DESCUENTO</option>
+<option>PRONTO PAGO</option>
+<option>PAGO TOTAL</option>
+<option>CUOTA MENSUAL</option>
+<option>CUOTA ACUERDO</option>
+</select>
+</div>
+
+<div class="field">
+<label>MEDIO DE PAGO</label>
+<select name="MEDIO_DE_PAGO" required>
+<option></option>
+<option>MERCADO PAGO</option>
+<option>CONSIGNACIÓN</option>
+<option>VOUCHER</option>
+<option>ADDI</option>
+<option>BANCOOMEVA</option>
+<option>COMULTRASAN</option>
+<option>FINCOMERCIO</option>
+<option>BANCO DE BOGOTÁ</option>
+</select>
+</div>
+
+<div class="field">
+<label>FECHA PAGO</label>
+<input type="date"
+id="fechaPago"
+name="FECHA_DE_PAGO"
+required>
+</div>
+
+</div>
+
+</div>
+
+<div class="card">
+<h3>COMPROBANTE</h3>
+<div class="grid">
+
+<div class="field">
+<label>ID COMPROBANTE</label>
+<input type="text"
+id="idComprobante"
+name="ID_COMPROBANTE"
+readonly
+required>
+</div>
+
+<div class="field">
+<label>ADJUNTAR</label>
+<a href="https://docs.google.com/forms/d/e/1FAIpQLScLD37TFI1QY3A4BuR3v97EGvhh-KnqHksl3KyiC3KpiVA8Pw/viewform?usp=header"
+target="_blank">
+
+<div class="comprobante-btn">
+Adjuntar comprobante
+</div>
+</a>
+</div>
+
+<div class="field">
+<label>&nbsp;</label>
+<button type="button"
+class="btn-limpiar"
+onclick="limpiarFormulario()">
+LIMPIAR
+</button>
+</div>
+
+<div class="field">
+<label>&nbsp;</label>
+<button type="submit"
+class="primary"
+id="submitButton">
+GUARDAR
+</button>
+</div>
+
+</div>
+</div>
+
+</form>
+
+<script>
+const alertBox=document.getElementById('customAlert');
+const valorPago=document.getElementById('valorPago');
+const valorSmart=document.getElementById('valorSmart');
+const valorCasa=document.getElementById('valorCasa');
+const fechaPago=document.getElementById('fechaPago');
+
+function generateUniqueId(){
+return Math.random()
+.toString(36)
+.substr(2,12)
+.toUpperCase();
+}
+document.addEventListener('DOMContentLoaded',()=>{
+document.getElementById('idComprobante')
+.value=generateUniqueId();
+const hoy=new Date().toISOString().split("T")[0];
+fechaPago.setAttribute("max",hoy);
+});
+
+function limpiarNumero(v){
+return parseFloat(
+v.replace(/[^\d]/g,'')
+)||0;
+}
+
+function formatNumber(n){
+return n.toLocaleString('es-CO');
+}
+['valorPago','valorSmart']
+.forEach(id=>{
+const el=document.getElementById(id);
+el.addEventListener('input',()=>{
+let v=el.value
+.replace(/[^\d]/g,'')
+.slice(0,10);
+el.value=v
+?parseInt(v)
+.toLocaleString('es-CO')
+:'';
+calcularValorCasa();
+});
+});
+
+function calcularValorCasa(){
+const pago=
+limpiarNumero(valorPago.value);
+const smart=
+limpiarNumero(valorSmart.value);
+valorCasa.value =
+pago>0
+?formatNumber(
+Math.max(0,pago-smart)
+)
+:'';
+}
+
+function alerta(msg,color){
+alertBox.textContent=msg;
+alertBox.style.background=color||"#28a745";
+alertBox.style.display='block';
+setTimeout(()=>{
+alertBox.style.display='none';
+},3000);
+}
+
+function limpiarFormulario(){
+document.getElementById("formulario").reset();
+valorCasa.value="";
+document.getElementById('idComprobante')
+.value=generateUniqueId();
+alerta("Formulario limpio","#3B6EDC");
+}
+</script>
+</body>
+</html>
